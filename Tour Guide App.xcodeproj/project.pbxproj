@@ -6,8 +6,19 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXContainerItemProxy section */
+		E651BBBD2EBEC1F300D87367 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E651BB8E2EBEB14E00D87367 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E651BB952EBEB14E00D87367;
+			remoteInfo = "Tour Guide App";
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		E651BB962EBEB14E00D87367 /* Tour Guide App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Tour Guide App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		E651BBBA2EBEC1F300D87367 /* Tour Guide AppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Tour Guide AppTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -16,10 +27,22 @@
 			path = "Tour Guide App";
 			sourceTree = "<group>";
 		};
+		E651BBB92EBEC1F300D87367 /* Tour Guide AppTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "Tour Guide AppTests";
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		E651BB932EBEB14E00D87367 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E651BBBC2EBEC1F300D87367 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -33,6 +56,7 @@
 			isa = PBXGroup;
 			children = (
 				E651BB982EBEB14E00D87367 /* Tour Guide App */,
+				E651BBB92EBEC1F300D87367 /* Tour Guide AppTests */,
 				E651BB972EBEB14E00D87367 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -41,6 +65,7 @@
 			isa = PBXGroup;
 			children = (
 				E651BB962EBEB14E00D87367 /* Tour Guide App.app */,
+				E651BBBA2EBEC1F300D87367 /* Tour Guide AppTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -70,6 +95,28 @@
 			productReference = E651BB962EBEB14E00D87367 /* Tour Guide App.app */;
 			productType = "com.apple.product-type.application";
 		};
+		E651BBB82EBEC1F300D87367 /* Tour Guide AppTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E651BBBF2EBEC1F300D87367 /* Build configuration list for PBXNativeTarget "Tour Guide AppTests" */;
+			buildPhases = (
+				E651BBBB2EBEC1F300D87367 /* Sources */,
+				E651BBBC2EBEC1F300D87367 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E651BBBE2EBEC1F300D87367 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				E651BBB92EBEC1F300D87367 /* Tour Guide AppTests */,
+			);
+			name = "Tour Guide AppTests";
+			packageProductDependencies = (
+			);
+			productName = "Tour Guide AppTests";
+			productReference = E651BBBA2EBEC1F300D87367 /* Tour Guide AppTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -81,6 +128,9 @@
 				LastUpgradeCheck = 2600;
 				TargetAttributes = {
 					E651BB952EBEB14E00D87367 = {
+						CreatedOnToolsVersion = 26.0.1;
+					};
+					E651BBB82EBEC1F300D87367 = {
 						CreatedOnToolsVersion = 26.0.1;
 					};
 				};
@@ -100,6 +150,7 @@
 			projectRoot = "";
 			targets = (
 				E651BB952EBEB14E00D87367 /* Tour Guide App */,
+				E651BBB82EBEC1F300D87367 /* Tour Guide AppTests */,
 			);
 		};
 /* End PBXProject section */
@@ -122,7 +173,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E651BBBB2EBEC1F300D87367 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		E651BBBE2EBEC1F300D87367 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E651BB952EBEB14E00D87367 /* Tour Guide App */;
+			targetProxy = E651BBBD2EBEC1F300D87367 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		E651BB9F2EBEB15000D87367 /* Debug */ = {
@@ -261,6 +327,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -293,6 +360,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -305,6 +373,42 @@
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		E651BBC02EBEC1F300D87367 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = R779FB365K;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "BuildTest.Tour-Guide-AppTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		E651BBC12EBEC1F300D87367 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = R779FB365K;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "BuildTest.Tour-Guide-AppTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -327,6 +431,15 @@
 			buildConfigurations = (
 				E651BBA22EBEB15000D87367 /* Debug */,
 				E651BBA32EBEB15000D87367 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E651BBBF2EBEC1F300D87367 /* Build configuration list for PBXNativeTarget "Tour Guide AppTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E651BBC02EBEC1F300D87367 /* Debug */,
+				E651BBC12EBEC1F300D87367 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
