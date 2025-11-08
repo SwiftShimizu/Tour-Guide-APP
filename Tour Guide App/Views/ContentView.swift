@@ -1,9 +1,16 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject private var intent = TourGuideIntent()
+    @StateObject private var intent: TourGuideIntent
+    @StateObject private var settingsViewModel: SettingsViewModel
     @State private var favoriteToastMessage: String?
     @State private var settingsDestination: SettingsDestination?
+
+    init() {
+        let intent = TourGuideIntent()
+        _intent = StateObject(wrappedValue: intent)
+        _settingsViewModel = StateObject(wrappedValue: SettingsViewModel(intent: intent))
+    }
 
     var body: some View {
         NavigationStack {
@@ -102,15 +109,15 @@ struct ContentView: View {
         }
         .tint(themeTintColor)
         .preferredColorScheme(preferredColorScheme)
-        .environment(\.dynamicTypeSize, intent.state.themeSettings.fontScale.dynamicTypeSize)
+        .environment(\.dynamicTypeSize, settingsViewModel.themeSettings.fontScale.dynamicTypeSize)
     }
 
     private var preferredColorScheme: ColorScheme? {
-        intent.state.themeSettings.colorStyle.colorScheme
+        settingsViewModel.themeSettings.colorStyle.colorScheme
     }
 
     private var themeTintColor: Color {
-        intent.state.themeSettings.colorStyle.tintColor
+        settingsViewModel.themeSettings.colorStyle.tintColor
     }
 
     private var selectedSpotBinding: Binding<TourSpot?> {

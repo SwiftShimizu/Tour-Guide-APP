@@ -1,30 +1,30 @@
 import SwiftUI
 
 struct SettingsRootView: View {
-    @ObservedObject var intent: TourGuideIntent
+    @ObservedObject var viewModel: SettingsViewModel
 
     var body: some View {
         List {
             Section("テーマ") {
                 NavigationLink {
-                    ThemeSelectionView(intent: intent)
+                    ThemeSelectionView(viewModel: viewModel)
                 } label: {
                     SettingsRow(
                         title: "テーマカラー",
-                        detail: intent.state.themeSettings.colorStyle.title,
-                        caption: intent.state.themeSettings.colorStyle.detail
+                        detail: viewModel.themeTitle,
+                        caption: viewModel.themeDetail
                     )
                 }
             }
 
             Section("表示") {
                 NavigationLink {
-                    FontScaleSettingsView(intent: intent)
+                    FontScaleSettingsView(viewModel: viewModel)
                 } label: {
                     SettingsRow(
                         title: "文字サイズ",
-                        detail: intent.state.themeSettings.fontScale.title,
-                        caption: intent.state.themeSettings.fontScale.sampleDescription
+                        detail: viewModel.fontTitle,
+                        caption: viewModel.fontDetail
                     )
                 }
             }
@@ -55,14 +55,14 @@ private struct SettingsRow: View {
 }
 
 struct ThemeSelectionView: View {
-    @ObservedObject var intent: TourGuideIntent
+    @ObservedObject var viewModel: SettingsViewModel
 
     var body: some View {
         List {
             Section(header: Text("テーマ"), footer: Text("選択したテーマはアプリ全体に即時反映されます")) {
                 ForEach(ThemeColorStyle.allCases) { style in
                     Button {
-                        Task { await intent.handle(.setThemeStyle(style)) }
+                        viewModel.selectTheme(style)
                     } label: {
                         HStack {
                             VStack(alignment: .leading, spacing: 2) {
@@ -72,7 +72,7 @@ struct ThemeSelectionView: View {
                                     .foregroundStyle(.secondary)
                             }
                             Spacer()
-                            if style == intent.state.themeSettings.colorStyle {
+                            if style == viewModel.selectedColorStyle {
                                 Image(systemName: "checkmark.circle.fill")
                                     .foregroundStyle(.tint)
                             }
@@ -87,7 +87,7 @@ struct ThemeSelectionView: View {
 }
 
 struct FontScaleSettingsView: View {
-    @ObservedObject var intent: TourGuideIntent
+    @ObservedObject var viewModel: SettingsViewModel
 
     var body: some View {
         List {
@@ -116,8 +116,8 @@ struct FontScaleSettingsView: View {
 
     private var selectionBinding: Binding<FontScalePreference> {
         Binding(
-            get: { intent.state.themeSettings.fontScale },
-            set: { newValue in Task { await intent.handle(.setFontScale(newValue)) } }
+            get: { viewModel.selectedFontScale },
+            set: { newValue in viewModel.selectFontScale(newValue) }
         )
     }
 }
