@@ -12,11 +12,14 @@ struct ContentView: View {
                     ProgressView("スポットを読み込み中…")
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else if intent.state.hasContent {
-                    spotsList
+                    HomeSpotListView(
+                        spots: intent.state.spots,
+                        tintColor: themeTintColor,
+                        onSelect: { spot in Task { await intent.handle(.selectSpot(spot)) } },
+                        onToggleFavorite: { id in Task { await intent.handle(.toggleFavorite(id: id)) } }
+                    )
                 } else {
-                    EmptyStateView(retryAction: {
-                        Task { await intent.handle(.retry) }
-                    })
+                    HomeEmptyStateView(retryAction: { Task { await intent.handle(.retry) } })
                 }
             }
             .navigationTitle("Tour Guide")
@@ -102,25 +105,12 @@ struct ContentView: View {
         .environment(\.dynamicTypeSize, intent.state.themeSettings.fontScale.dynamicTypeSize)
     }
 
-    private var spotsList: some View {
-        List(intent.state.spots) { spot in
-            Button {
-                Task { await intent.handle(.selectSpot(spot)) }
-            } label: {
-                TourSpotRowView(spot: spot, tintColor: themeTintColor)
-            }
-            .buttonStyle(.plain)
-            .swipeActions(edge: .trailing) {
-                Button {
-                    Task { await intent.handle(.toggleFavorite(id: spot.id)) }
-                } label: {
-                    Label(spot.isFavorite ? "解除" : "追加", systemImage: spot.isFavorite ? "heart.slash" : "heart.fill")
-                }
-                .tint(spot.isFavorite ? .gray : .pink)
-            }
-        }
-        .animation(.default, value: intent.state.spots)
-        .listStyle(.plain)
+    private var preferredColorScheme: ColorScheme? {
+        intent.state.themeSettings.colorStyle.colorScheme
+    }
+
+    private var themeTintColor: Color {
+        intent.state.themeSettings.colorStyle.tintColor
     }
 
     private var selectedSpotBinding: Binding<TourSpot?> {
@@ -144,133 +134,13 @@ struct ContentView: View {
     }
 }
 
-private struct TourSpotRowView: View {
-    let spot: TourSpot
-    let tintColor: Color
-
-    var body: some View {
-        HStack(spacing: 16) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(tintColor.opacity(0.2))
-                Image(systemName: spot.heroImageName.isEmpty ? "globe.asia.australia.fill" : spot.heroImageName)
-                    .font(.title2)
-                    .foregroundStyle(tintColor)
-            }
-            .frame(width: 60, height: 60)
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text(spot.name)
-                    .font(.headline)
-                Text(spot.locationDescription)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                Text(spot.shortHighlights)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-
-            Spacer()
-
-            Image(systemName: spot.isFavorite ? "heart.fill" : "heart")
-                .foregroundStyle(spot.isFavorite ? .pink : .secondary)
-                .accessibilityHidden(true)
-        }
-        .padding(.vertical, 8)
-    }
-}
-
-private struct EmptyStateView: View {
-    let retryAction: () -> Void
-
-    var body: some View {
-        VStack(spacing: 16) {
-            Image(systemName: "mappin.circle")
-                .font(.system(size: 48))
-                .foregroundStyle(.secondary)
-            Text("まだスポットがありません")
-                .font(.headline)
-            Text("[再試行]をタップしてローカルデータを読み込んでください。")
-                .multilineTextAlignment(.center)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-            Button("再試行", action: retryAction)
-                .buttonStyle(.borderedProminent)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .padding()
-    }
-}
-
-private struct FavoriteToastView: View {
-    let message: String
-
-    var body: some View {
-        Text(message)
-            .font(.footnote)
-            .padding(.horizontal, 16)
-            .padding(.vertical, 8)
-            .background(.ultraThinMaterial, in: Capsule())
-            .shadow(radius: 4)
-            .padding(.horizontal)
-    }
-}
-
-private extension ContentView {
-    var preferredColorScheme: ColorScheme? {
-        intent.state.themeSettings.colorStyle.colorScheme
-    }
-
-    var themeTintColor: Color {
-        intent.state.themeSettings.colorStyle.tintColor
-    }
-}
-
 private enum SettingsDestination: Identifiable {
     case root
 
     var id: Int {
         switch self {
-        case .root: return 0
-        }
-    }
-}
-
-private extension ThemeColorStyle {
-    var colorScheme: ColorScheme? {
-        switch self {
-        case .system:
-            return nil
-        case .light:
-            return .light
-        case .dark, .dusk:
-            return .dark
-        }
-    }
-
-    var tintColor: Color {
-        switch self {
-        case .system:
-            return .accentColor
-        case .light:
-            return .orange
-        case .dark:
-            return .teal
-        case .dusk:
-            return .purple
-        }
-    }
-}
-
-private extension FontScalePreference {
-    var dynamicTypeSize: DynamicTypeSize {
-        switch self {
-        case .standard:
-            return .large
-        case .relaxed:
-            return .xLarge
-        case .large:
-            return .accessibility3
+        case .root:
+            return 0
         }
     }
 }
