@@ -12,44 +12,57 @@ struct ContentView: View {
         _settingsViewModel = StateObject(wrappedValue: SettingsViewModel(intent: intent))
     }
 
+    @ViewBuilder
+    private var mainContent: some View {
+        if intent.state.isLoading && !intent.state.hasContent {
+            ProgressView("スポットを読み込み中…")
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else if intent.state.hasContent {
+            HomeSpotListView(
+                spots: intent.state.spots,
+                tintColor: themeTintColor,
+                onSelect: { spot in Task { await intent.handle(.selectSpot(spot)) } },
+                onToggleFavorite: { id in Task { await intent.handle(.toggleFavorite(id: id)) } }
+            )
+        } else {
+            HomeEmptyStateView(retryAction: { Task { await intent.handle(.retry) } })
+        }
+    }
+
+    @ViewBuilder
+    private var settingsButton: some View {
+        Button {
+            settingsDestination = .root
+        } label: {
+            Label("設定", systemImage: "gearshape")
+        }
+    }
+
+    @ViewBuilder
+    private var refreshButton: some View {
+        Button {
+            Task { await intent.handle(.retry) }
+        } label: {
+            if intent.state.isLoading {
+                ProgressView()
+            } else {
+                Image(systemName: "arrow.clockwise")
+            }
+        }
+        .accessibilityLabel("最新の情報に更新")
+        .disabled(intent.state.isLoading)
+    }
+
     var body: some View {
         NavigationStack {
-            Group {
-                if intent.state.isLoading && !intent.state.hasContent {
-                    ProgressView("スポットを読み込み中…")
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else if intent.state.hasContent {
-                    HomeSpotListView(
-                        spots: intent.state.spots,
-                        tintColor: themeTintColor,
-                        onSelect: { spot in Task { await intent.handle(.selectSpot(spot)) } },
-                        onToggleFavorite: { id in Task { await intent.handle(.toggleFavorite(id: id)) } }
-                    )
-                } else {
-                    HomeEmptyStateView(retryAction: { Task { await intent.handle(.retry) } })
-                }
-            }
+            mainContent
             .navigationTitle("Tour Guide")
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button {
-                        settingsDestination = .root
-                    } label: {
-                        Label("設定", systemImage: "gearshape")
-                    }
+                    settingsButton
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        Task { await intent.handle(.retry) }
-                    } label: {
-                        if intent.state.isLoading {
-                            ProgressView()
-                        } else {
-                            Image(systemName: "arrow.clockwise")
-                        }
-                    }
-                    .accessibilityLabel("最新の情報に更新")
-                    .disabled(intent.state.isLoading)
+                    refreshButton
                 }
             }
             .navigationDestination(item: selectedSpotBinding) { spot in
@@ -63,7 +76,7 @@ struct ContentView: View {
             .navigationDestination(item: $settingsDestination) { destination in
                 switch destination {
                 case .root:
-                    SettingsRootView(intent: intent)
+                    SettingsRootView(viewModel: settingsViewModel)
                 }
             }
         }
@@ -123,7 +136,7 @@ struct ContentView: View {
     private var selectedSpotBinding: Binding<TourSpot?> {
         Binding<TourSpot?>(
             get: { intent.state.selectedSpot },
-            set: { newValue in
+            set: { (newValue: TourSpot?) in
                 Task { await intent.handle(.selectSpot(newValue)) }
             }
         )
@@ -132,7 +145,7 @@ struct ContentView: View {
     private var errorBinding: Binding<Bool> {
         Binding<Bool>(
             get: { intent.state.errorMessage != nil },
-            set: { isPresented in
+            set: { (isPresented: Bool) in
                 if !isPresented {
                     Task { await intent.handle(.dismissError) }
                 }
