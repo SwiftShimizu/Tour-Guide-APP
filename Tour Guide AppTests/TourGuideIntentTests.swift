@@ -6,7 +6,12 @@ final class TourGuideIntentTests: XCTestCase {
     func testHandleLoadSpotsUpdatesState() async {
         let repository = TourSpotRepositoryStub(result: .success(TourSpot.mockSpots))
         let themeRepository = ThemeSettingsRepositoryStub()
-        let intent = TourGuideIntent(repository: repository, themeRepository: themeRepository)
+        let favoritesRepository = FavoritesRepositoryStub()
+        let intent = TourGuideIntent(
+            repository: repository,
+            themeRepository: themeRepository,
+            favoritesRepository: favoritesRepository
+        )
 
         await intent.handle(.loadSpots)
 
@@ -19,7 +24,12 @@ final class TourGuideIntentTests: XCTestCase {
         enum StubError: Error { case failed }
         let repository = TourSpotRepositoryStub(result: .failure(StubError.failed))
         let themeRepository = ThemeSettingsRepositoryStub()
-        let intent = TourGuideIntent(repository: repository, themeRepository: themeRepository)
+        let favoritesRepository = FavoritesRepositoryStub()
+        let intent = TourGuideIntent(
+            repository: repository,
+            themeRepository: themeRepository,
+            favoritesRepository: favoritesRepository
+        )
 
         await intent.handle(.loadSpots)
 
@@ -31,7 +41,12 @@ final class TourGuideIntentTests: XCTestCase {
     func testToggleFavoriteViaIntentUpdatesState() async {
         let repository = TourSpotRepositoryStub(result: .success(TourSpot.mockSpots))
         let themeRepository = ThemeSettingsRepositoryStub()
-        let intent = TourGuideIntent(repository: repository, themeRepository: themeRepository)
+        let favoritesRepository = FavoritesRepositoryStub()
+        let intent = TourGuideIntent(
+            repository: repository,
+            themeRepository: themeRepository,
+            favoritesRepository: favoritesRepository
+        )
         await intent.handle(.loadSpots)
         let target = intent.state.spots[0]
 
@@ -45,7 +60,11 @@ final class TourGuideIntentTests: XCTestCase {
         let themeSettings = ThemeSettings(colorStyle: .dusk, fontScale: .relaxed)
         let themeRepository = ThemeSettingsRepositoryStub(initial: themeSettings)
 
-        let intent = TourGuideIntent(repository: repository, themeRepository: themeRepository)
+        let intent = TourGuideIntent(
+            repository: repository,
+            themeRepository: themeRepository,
+            favoritesRepository: FavoritesRepositoryStub()
+        )
 
         XCTAssertEqual(intent.state.themeSettings, themeSettings)
     }
@@ -53,7 +72,11 @@ final class TourGuideIntentTests: XCTestCase {
     func testThemeUpdatesPersistViaIntent() async {
         let repository = TourSpotRepositoryStub(result: .success(TourSpot.mockSpots))
         let themeRepository = ThemeSettingsRepositoryStub()
-        let intent = TourGuideIntent(repository: repository, themeRepository: themeRepository)
+        let intent = TourGuideIntent(
+            repository: repository,
+            themeRepository: themeRepository,
+            favoritesRepository: FavoritesRepositoryStub()
+        )
 
         await intent.handle(.setThemeStyle(.dark))
         await intent.handle(.setFontScale(.large))
@@ -62,5 +85,37 @@ final class TourGuideIntentTests: XCTestCase {
         XCTAssertEqual(intent.state.themeSettings.fontScale, .large)
         XCTAssertEqual(themeRepository.storedSettings.fontScale, .large)
         XCTAssertEqual(themeRepository.saveCallCount, 2)
+    }
+
+    func testFavoritesLoadedFromRepository() async {
+        let repository = TourSpotRepositoryStub(result: .success(TourSpot.mockSpots))
+        let favoriteID = TourSpot.mockSpots[1].id
+        let favoritesRepository = FavoritesRepositoryStub(initial: Set([favoriteID]))
+        let intent = TourGuideIntent(
+            repository: repository,
+            themeRepository: ThemeSettingsRepositoryStub(),
+            favoritesRepository: favoritesRepository
+        )
+
+        await intent.handle(.loadSpots)
+
+        XCTAssertTrue(intent.state.spots[1].isFavorite)
+    }
+
+    func testFavoriteTogglePersists() async {
+        let repository = TourSpotRepositoryStub(result: .success(TourSpot.mockSpots))
+        let favoritesRepository = FavoritesRepositoryStub()
+        let intent = TourGuideIntent(
+            repository: repository,
+            themeRepository: ThemeSettingsRepositoryStub(),
+            favoritesRepository: favoritesRepository
+        )
+        await intent.handle(.loadSpots)
+        let target = intent.state.spots[0]
+
+        await intent.handle(.toggleFavorite(id: target.id))
+
+        XCTAssertEqual(favoritesRepository.stored.contains(target.id), true)
+        XCTAssertGreaterThan(favoritesRepository.saveCallCount, 0)
     }
 }

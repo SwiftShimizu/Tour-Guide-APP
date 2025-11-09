@@ -19,17 +19,20 @@ final class TourGuideIntent: ObservableObject {
     private let reducer: TourGuideReducer
     private let repository: TourSpotRepository
     private let themeRepository: ThemeSettingsRepository
+    private let favoritesRepository: FavoritesRepository
 
     init(
         state: TourGuideState = TourGuideState(),
         reducer: TourGuideReducer = TourGuideReducer(),
         repository: TourSpotRepository = LocalTourSpotRepository(),
-        themeRepository: ThemeSettingsRepository = UserDefaultsThemeSettingsRepository()
+        themeRepository: ThemeSettingsRepository = UserDefaultsThemeSettingsRepository(),
+        favoritesRepository: FavoritesRepository = UserDefaultsFavoritesRepository()
     ) {
         self.state = state
         self.reducer = reducer
         self.repository = repository
         self.themeRepository = themeRepository
+        self.favoritesRepository = favoritesRepository
         self.state.themeSettings = themeRepository.loadSettings()
     }
 
@@ -39,6 +42,7 @@ final class TourGuideIntent: ObservableObject {
             await loadSpots()
         case .toggleFavorite(let id):
             dispatch(.toggleFavorite(id))
+            persistFavorites()
         case .selectSpot(let spot):
             dispatch(.selectSpot(spot))
         case .dismissError:
@@ -53,10 +57,16 @@ final class TourGuideIntent: ObservableObject {
     private func loadSpots() async {
         dispatch(.setLoading(true))
         do {
-            let spots = try await repository.fetchSpots()
+            let favorites = favoritesRepository.loadFavorites()
+            let spots = try await repository.fetchSpots().map { spot -> TourSpot in
+                var mutable = spot
+                mutable.isFavorite = favorites.contains(spot.id)
+                return mutable
+            }
             dispatch(.spotsLoaded(spots, Date()))
             dispatch(.setLoading(false))
             dispatch(.setError(nil))
+            refreshFavoritesIfNeeded()
         } catch {
             let message = error.localizedDescription.isEmpty ? "スポット情報を取得できませんでした。" : error.localizedDescription
             dispatch(.setError(message))
@@ -77,5 +87,17 @@ final class TourGuideIntent: ObservableObject {
         update(&settings)
         themeRepository.save(settings: settings)
         dispatch(.setTheme(settings))
+    }
+
+    private func persistFavorites() {
+        let ids = Set(state.spots.filter { $0.isFavorite }.map { $0.id })
+        favoritesRepository.saveFavorites(ids)
+    }
+
+    private func refreshFavoritesIfNeeded() {
+        let stored = favoritesRepository.loadFavorites()
+        let ids = Set(state.spots.filter { $0.isFavorite }.map { $0.id })
+        guard stored != ids else { return }
+        favoritesRepository.saveFavorites(ids)
     }
 }
