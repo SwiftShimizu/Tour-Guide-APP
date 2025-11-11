@@ -9,7 +9,8 @@
     "highlights": ["千本鳥居", "ご利益巡り", "早朝ハイキング"],
     "isFavorite": true,
     "rating": 4.9,
-    "tags": ["歴史", "寺社", "京都"]
+    "tags": ["歴史", "寺社", "京都"],
+    "reviews": []
   },
   {
     "id": "ACF4D3A9-4D46-4B5A-8C18-3C83D5A60644",
@@ -21,7 +22,8 @@
     "highlights": ["合掌造り", "雪景色", "郷土料理"],
     "isFavorite": false,
     "rating": 4.7,
-    "tags": ["世界遺産", "自然", "体験"]
+    "tags": ["世界遺産", "自然", "体験"],
+    "reviews": []
   },
   {
     "id": "FA9675AE-5947-4A49-AC14-6D07BE3A1929",
@@ -33,6 +35,7 @@
     "highlights": ["温泉", "木造建築", "温泉街散策"],
     "isFavorite": false,
     "rating": 4.6,
-    "tags": ["温泉", "四国", "文化"]
+    "tags": ["温泉", "四国", "文化"],
+    "reviews": []
   }
 ]

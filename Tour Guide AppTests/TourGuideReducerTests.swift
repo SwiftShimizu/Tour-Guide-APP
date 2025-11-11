@@ -45,4 +45,15 @@ final class TourGuideReducerTests: XCTestCase {
 
         XCTAssertEqual(state.themeSettings, settings)
     }
+
+    func testSetUserContentStoresEntry() {
+        var state = TourGuideState()
+        let reducer = TourGuideReducer()
+        let spotID = UUID()
+        let content = UserSpotContent(note: "memo", checklist: [])
+
+        _ = reducer.reduce(state: &state, action: .setUserContent(spotID: spotID, content: content))
+
+        XCTAssertEqual(state.userContents[spotID], content)
+    }
 }

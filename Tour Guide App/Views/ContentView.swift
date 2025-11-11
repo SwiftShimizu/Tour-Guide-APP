@@ -66,10 +66,21 @@ struct ContentView: View {
                 }
             }
             .navigationDestination(item: selectedSpotBinding) { spot in
+                let content = intent.state.content(for: spot)
                 TourSpotDetailView(
                     spot: spot,
+                    userContent: content,
                     onToggleFavorite: {
                         Task { await intent.handle(.toggleFavorite(id: spot.id)) }
+                    },
+                    onUpdateNote: { text in
+                        Task { await intent.handle(.updateNote(spotID: spot.id, text: text)) }
+                    },
+                    onToggleChecklist: { itemID in
+                        Task { await intent.handle(.toggleChecklistItem(spotID: spot.id, itemID: itemID)) }
+                    },
+                    onAddChecklistItem: { title in
+                        Task { await intent.handle(.addChecklistItem(spotID: spot.id, title: title)) }
                     }
                 )
             }

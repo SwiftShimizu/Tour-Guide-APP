@@ -7,6 +7,7 @@ struct TourGuideState: Equatable {
     var errorMessage: String?
     var lastUpdated: Date?
     var themeSettings: ThemeSettings = .default
+    var userContents: [UUID: UserSpotContent] = [:]
 
     var hasContent: Bool {
         !spots.isEmpty
@@ -14,6 +15,10 @@ struct TourGuideState: Equatable {
 
     var favoritesCount: Int {
         spots.filter { $0.isFavorite }.count
+    }
+
+    func content(for spot: TourSpot) -> UserSpotContent {
+        userContents[spot.id] ?? UserSpotContent.template(for: spot)
     }
 }
 

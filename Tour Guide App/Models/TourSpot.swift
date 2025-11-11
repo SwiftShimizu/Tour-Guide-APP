@@ -11,6 +11,7 @@ struct TourSpot: Identifiable, Codable, Equatable, Hashable {
     var isFavorite: Bool
     let rating: Double
     let tags: [String]
+    var reviews: [TourSpotReview]
 
     var locationDescription: String {
         "\(city), \(country)"
@@ -30,7 +31,8 @@ struct TourSpot: Identifiable, Codable, Equatable, Hashable {
         highlights: [],
         isFavorite: false,
         rating: 0,
-        tags: []
+        tags: [],
+        reviews: []
     )
 }
 
@@ -46,7 +48,8 @@ extension TourSpot {
             highlights: ["千本鳥居", "ご利益巡り", "早朝ハイキング"],
             isFavorite: true,
             rating: 4.9,
-            tags: ["歴史", "寺社", "京都"]
+            tags: ["歴史", "寺社", "京都"],
+            reviews: TourSpotReview.samples(for: "伏見稲荷大社")
         ),
         TourSpot(
             id: UUID(uuidString: "ACF4D3A9-4D46-4B5A-8C18-3C83D5A60644")!,
@@ -58,7 +61,8 @@ extension TourSpot {
             highlights: ["合掌造り", "雪景色", "郷土料理"],
             isFavorite: false,
             rating: 4.7,
-            tags: ["世界遺産", "自然", "体験"]
+            tags: ["世界遺産", "自然", "体験"],
+            reviews: TourSpotReview.samples(for: "白川郷")
         ),
         TourSpot(
             id: UUID(uuidString: "FA9675AE-5947-4A49-AC14-6D07BE3A1929")!,
@@ -70,7 +74,8 @@ extension TourSpot {
             highlights: ["温泉", "木造建築", "温泉街散策"],
             isFavorite: false,
             rating: 4.6,
-            tags: ["温泉", "四国", "文化"]
+            tags: ["温泉", "四国", "文化"],
+            reviews: TourSpotReview.samples(for: "道後温泉")
         )
     ]
 }

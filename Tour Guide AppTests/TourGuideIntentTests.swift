@@ -10,7 +10,8 @@ final class TourGuideIntentTests: XCTestCase {
         let intent = TourGuideIntent(
             repository: repository,
             themeRepository: themeRepository,
-            favoritesRepository: favoritesRepository
+            favoritesRepository: favoritesRepository,
+            userContentRepository: UserSpotContentRepositoryStub()
         )
 
         await intent.handle(.loadSpots)
@@ -28,7 +29,8 @@ final class TourGuideIntentTests: XCTestCase {
         let intent = TourGuideIntent(
             repository: repository,
             themeRepository: themeRepository,
-            favoritesRepository: favoritesRepository
+            favoritesRepository: favoritesRepository,
+            userContentRepository: UserSpotContentRepositoryStub()
         )
 
         await intent.handle(.loadSpots)
@@ -45,7 +47,8 @@ final class TourGuideIntentTests: XCTestCase {
         let intent = TourGuideIntent(
             repository: repository,
             themeRepository: themeRepository,
-            favoritesRepository: favoritesRepository
+            favoritesRepository: favoritesRepository,
+            userContentRepository: UserSpotContentRepositoryStub()
         )
         await intent.handle(.loadSpots)
         let target = intent.state.spots[0]
@@ -63,7 +66,8 @@ final class TourGuideIntentTests: XCTestCase {
         let intent = TourGuideIntent(
             repository: repository,
             themeRepository: themeRepository,
-            favoritesRepository: FavoritesRepositoryStub()
+            favoritesRepository: FavoritesRepositoryStub(),
+            userContentRepository: UserSpotContentRepositoryStub()
         )
 
         XCTAssertEqual(intent.state.themeSettings, themeSettings)
@@ -75,7 +79,8 @@ final class TourGuideIntentTests: XCTestCase {
         let intent = TourGuideIntent(
             repository: repository,
             themeRepository: themeRepository,
-            favoritesRepository: FavoritesRepositoryStub()
+            favoritesRepository: FavoritesRepositoryStub(),
+            userContentRepository: UserSpotContentRepositoryStub()
         )
 
         await intent.handle(.setThemeStyle(.dark))
@@ -94,7 +99,8 @@ final class TourGuideIntentTests: XCTestCase {
         let intent = TourGuideIntent(
             repository: repository,
             themeRepository: ThemeSettingsRepositoryStub(),
-            favoritesRepository: favoritesRepository
+            favoritesRepository: favoritesRepository,
+            userContentRepository: UserSpotContentRepositoryStub()
         )
 
         await intent.handle(.loadSpots)
@@ -108,7 +114,8 @@ final class TourGuideIntentTests: XCTestCase {
         let intent = TourGuideIntent(
             repository: repository,
             themeRepository: ThemeSettingsRepositoryStub(),
-            favoritesRepository: favoritesRepository
+            favoritesRepository: favoritesRepository,
+            userContentRepository: UserSpotContentRepositoryStub()
         )
         await intent.handle(.loadSpots)
         let target = intent.state.spots[0]
@@ -117,5 +124,42 @@ final class TourGuideIntentTests: XCTestCase {
 
         XCTAssertEqual(favoritesRepository.stored.contains(target.id), true)
         XCTAssertGreaterThan(favoritesRepository.saveCallCount, 0)
+    }
+
+    func testUpdateNotePersistsContent() async {
+        let spot = TourSpot.mockSpots[0]
+        let repository = TourSpotRepositoryStub(result: .success(TourSpot.mockSpots))
+        let contentRepository = UserSpotContentRepositoryStub(initial: [spot.id: UserSpotContent(note: \"旧メモ\", checklist: [])])
+        let intent = TourGuideIntent(
+            repository: repository,
+            themeRepository: ThemeSettingsRepositoryStub(),
+            favoritesRepository: FavoritesRepositoryStub(),
+            userContentRepository: contentRepository
+        )
+        await intent.handle(.loadSpots)
+
+        await intent.handle(.updateNote(spotID: spot.id, text: \"最新メモ\"))
+
+        XCTAssertEqual(intent.state.userContents[spot.id]?.note, \"最新メモ\")
+        XCTAssertEqual(contentRepository.storage[spot.id]?.note, \"最新メモ\")
+    }
+
+    func testToggleChecklistItemUpdatesState() async {
+        var content = UserSpotContent(note: \"\", checklist: [SpotChecklistItem(title: \"撮影スポット\")])
+        let itemID = content.checklist[0].id
+        let spot = TourSpot.mockSpots[0]
+        let repository = TourSpotRepositoryStub(result: .success(TourSpot.mockSpots))
+        let contentRepository = UserSpotContentRepositoryStub(initial: [spot.id: content])
+        let intent = TourGuideIntent(
+            repository: repository,
+            themeRepository: ThemeSettingsRepositoryStub(),
+            favoritesRepository: FavoritesRepositoryStub(),
+            userContentRepository: contentRepository
+        )
+        await intent.handle(.loadSpots)
+
+        await intent.handle(.toggleChecklistItem(spotID: spot.id, itemID: itemID))
+
+        XCTAssertEqual(intent.state.userContents[spot.id]?.checklist[0].isCompleted, true)
     }
 }

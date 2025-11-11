@@ -7,6 +7,7 @@ enum TourGuideAction: Equatable {
     case selectSpot(TourSpot?)
     case setError(String?)
     case setTheme(ThemeSettings)
+    case setUserContent(spotID: UUID, content: UserSpotContent)
 }
 
 struct TourGuideReducer {
@@ -37,6 +38,12 @@ struct TourGuideReducer {
             return []
         case .setTheme(let settings):
             state.themeSettings = settings
+            return []
+        case let .setUserContent(spotID, content):
+            state.userContents[spotID] = content
+            if let selected = state.selectedSpot, selected.id == spotID {
+                state.selectedSpot = state.spots.first(where: { $0.id == spotID })
+            }
             return []
         }
     }
